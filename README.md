@@ -6,10 +6,12 @@ Encode an image with [sixel-sys].
 
 [sixel-sys]: https://crates.io/crates/sixel-sys
 
-This is my first crate that uses `unsafe` and FFI. Please inspect the source code yourself, the
+⚠️ This is my first crate that uses `unsafe` and FFI. Please inspect the source code yourself, the
 crate is very small. PRs are welcome.
 
-To write a sixel to a file, [sixel-rs] is probably safer and has more options.
+To write a sixel to a file, [sixel-rs] is safer and has more options.
+
+Despite being called sixel-bytes, this crates produces a `String`.
 
 [sixel-rs]: https://crates.io/crates/sixel-rs
 
@@ -63,11 +65,16 @@ the `image` feature.
 
 `test-sixel` just generates some 255x255 image with a gradient and dumps it to stdout.
 
+Only certain terminals / terminal emulators have the capability to render sixel graphics.
+See https://www.arewesixelyet.com/ for a list of programs that support sixels.
+
+Try running `xterm` with `-ti 340`.
+
 ## Features
 The `image` feature is disabled by default but needed for the `sixel` binary.
 
 [image]: https://crates.io/crates/image
 
-Current version: 0.2.1
+Current version: 0.2.2
 
 License: MIT

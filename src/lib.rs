@@ -2,10 +2,12 @@
 //!
 //! [sixel-sys]: https://crates.io/crates/sixel-sys
 //!
-//! This is my first crate that uses `unsafe` and FFI. Please inspect the source code yourself, the
+//! ⚠️ This is my first crate that uses `unsafe` and FFI. Please inspect the source code yourself, the
 //! crate is very small. PRs are welcome.
 //!
-//! To write a sixel to a file, [sixel-rs] is probably safer and has more options.
+//! To write a sixel to a file, [sixel-rs] is safer and has more options.
+//!
+//! Despite being called sixel-bytes, this crates produces a `String`.
 //!
 //! [sixel-rs]: https://crates.io/crates/sixel-rs
 //!
@@ -59,6 +61,11 @@
 //!
 //! `test-sixel` just generates some 255x255 image with a gradient and dumps it to stdout.
 //!
+//! Only certain terminals / terminal emulators have the capability to render sixel graphics.
+//! See https://www.arewesixelyet.com/ for a list of programs that support sixels.
+//!
+//! Try running `xterm` with `-ti 340`.
+//!
 //! # Features
 //! The `image` feature is disabled by default but needed for the `sixel` binary.
 //!
@@ -76,9 +83,10 @@ pub use sixel_sys::status::Status;
 pub use sixel_sys::DiffusionMethod;
 pub use sixel_sys::PixelFormat;
 use sixel_sys::{
-    sixel_dither_initialize, sixel_dither_new, sixel_dither_set_diffusion_type,
-    sixel_dither_set_pixelformat, sixel_encode, sixel_output_destroy, sixel_output_new,
-    sixel_output_set_encode_policy, Dither, EncodePolicy, MethodForLargest, Output,
+    sixel_dither_destroy, sixel_dither_initialize, sixel_dither_new,
+    sixel_dither_set_diffusion_type, sixel_dither_set_pixelformat, sixel_encode,
+    sixel_output_destroy, sixel_output_new, sixel_output_set_encode_policy, Dither, EncodePolicy,
+    MethodForLargest, Output,
 };
 
 #[derive(Debug)]
@@ -130,7 +138,7 @@ pub fn sixel_string(
     method_for_diffuse: DiffusionMethod,
 ) -> Result<String, SixelError> {
     let mut sixel_data: Vec<i8> = Vec::new();
-    let rust_object_ptr: *mut c_void = &mut sixel_data as *mut _ as *mut c_void;
+    let sixel_data_ptr: *mut c_void = &mut sixel_data as *mut _ as *mut c_void;
 
     let mut output: *mut Output = ptr::null_mut() as *mut _;
     let output_ptr: *mut *mut Output = &mut output as *mut _;
@@ -157,7 +165,7 @@ pub fn sixel_string(
         SixelError::from_status(sixel_output_new(
             output_ptr,
             Some(callback),
-            rust_object_ptr,
+            sixel_data_ptr,
             ptr::null_mut(),
         ))?;
 
@@ -165,7 +173,7 @@ pub fn sixel_string(
 
         SixelError::from_status(sixel_dither_new(dither_ptr, 256, ptr::null_mut()))?;
 
-        sixel_dither_initialize(
+        SixelError::from_status(sixel_dither_initialize(
             dither,
             pixels,
             width,
@@ -174,7 +182,7 @@ pub fn sixel_string(
             MethodForLargest::Auto,
             sixel_sys::MethodForRepColor::Auto,
             sixel_sys::QualityMode::Auto,
-        );
+        ))?;
         sixel_dither_set_pixelformat(dither, pixelformat);
         sixel_dither_set_diffusion_type(dither, method_for_diffuse);
 
@@ -188,6 +196,7 @@ pub fn sixel_string(
         ))?;
 
         sixel_output_destroy(output);
+        sixel_dither_destroy(dither);
 
         // TODO: should we just return something like [u8]? Is all sixel data valid utf8?
         String::from_utf8(mem::transmute(sixel_data)).map_err(SixelError::Utf8)

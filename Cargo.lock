@@ -459,7 +459,7 @@ checksum = "238abfbb77c1915110ad968465608b68e869e0772622c9656714e73e5a1a522f"
 
 [[package]]
 name = "sixel-bytes"
-version = "0.2.1"
+version = "0.2.2"
 dependencies = [
  "image",
  "sixel-sys",
