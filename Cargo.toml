@@ -1,0 +1,28 @@
+[package]
+name = "sixel-bytes"
+description = "Encode an image with sixel-sys/libsixel"
+version = "0.2.1"
+edition = "2021"
+authors = ["Benjamin Große <ste3ls@gmail.com>"]
+license = "MIT"
+categories = ["graphics", "multimedia::images"]
+readme = "README.md"
+repository = "http://github.com/benjajaja/sixel-bytes"
+default-run = "test-sixel"
+
+[features]
+default = []
+image = ["dep:image"]
+
+[dependencies]
+sixel-sys = "0.3.1"
+image = { version = "0.24.5", optional = true }
+
+[[bin]]
+name = "sixel"
+path = "src/bin/sixel.rs"
+required-features = ["image"]
+
+[[bin]]
+name = "test-sixel"
+path = "src/bin/test-sixel.rs"
