@@ -7,7 +7,7 @@ authors = ["Benjamin Große <ste3ls@gmail.com>"]
 license = "MIT"
 categories = ["graphics", "multimedia::images"]
 readme = "README.md"
-repository = "http://github.com/benjajaja/sixel-bytes"
+repository = "https://github.com/benjajaja/sixel-bytes"
 default-run = "test-sixel"
 
 [features]
