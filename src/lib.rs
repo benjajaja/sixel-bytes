@@ -137,7 +137,7 @@ pub fn sixel_string(
     pixelformat: PixelFormat,
     method_for_diffuse: DiffusionMethod,
 ) -> Result<String, SixelError> {
-    let mut sixel_data: Vec<i8> = Vec::new();
+    let mut sixel_data: Vec<::std::os::raw::c_char> = Vec::new();
     let sixel_data_ptr: *mut c_void = &mut sixel_data as *mut _ as *mut c_void;
 
     let mut output: *mut Output = ptr::null_mut() as *mut _;
@@ -153,9 +153,10 @@ pub fn sixel_string(
         size: ::std::os::raw::c_int,
         priv_: *mut ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int {
-        let sixel_data: &mut Vec<i8> = &mut *(priv_ as *mut Vec<i8>);
+        let sixel_data: &mut Vec<::std::os::raw::c_char> =
+            &mut *(priv_ as *mut Vec<::std::os::raw::c_char>);
 
-        let data_slice: &mut [i8] =
+        let data_slice: &mut [::std::os::raw::c_char] =
             slice::from_raw_parts_mut(if data.is_null() { return 1 } else { data }, size as usize);
         sixel_data.append(&mut data_slice.to_vec());
         status::OK
