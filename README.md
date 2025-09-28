@@ -1,3 +1,10 @@
+# ABANDONED!
+
+Alternatives:
+* https://github.com/Jesterhearts/a-sixel
+* https://github.com/mkrueger/icy_sixel
+* Some other crate for the libsixel C library
+
 # sixel-bytes
 
 ![Screenshot](./assets/Screenshot.png)
